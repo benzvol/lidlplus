@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lidl Plus Healthiness Index</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #131a2e;
+      --border: rgba(148,163,184,.18);
+      --text: #ecf2ff;
+      --muted: #94a3b8;
+      --accent: #7dd3fc;
+      --accent-2: #34d399;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #08101e 0%, #0d1426 100%);
+      color: var(--text);
+    }
+    .wrap { max-width: 1400px; margin: 0 auto; padding: 28px; }
+    h1 { margin: 0 0 8px; font-size: 30px; }
+    .sub { color: var(--muted); margin-bottom: 22px; }
+    .cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .card, .panel {
+      background: rgba(19,26,46,.92);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 12px 28px rgba(0,0,0,.18);
+    }
+    .card { padding: 18px; }
+    .label { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+    .value { font-size: 28px; font-weight: 700; margin-top: 8px; }
+    .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-top: 16px; }
+    .panel { padding: 18px; }
+    .panel h2 { margin: 0 0 10px; font-size: 18px; }
+    .panel p { margin: 8px 0 0; color: var(--muted); }
+    .chart-box { height: 360px; }
+    .section { margin-top: 18px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    th { color: var(--muted); font-weight: 600; }
+    .note { color: var(--muted); font-size: 13px; line-height: 1.5; }
+    @media (max-width: 1100px) {
+      .cards, .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Lidl Plus Healthiness Index</h1>
+    <div class="sub">Heuristic category-based score · normalized to Jul-Sep 2022 = 100</div>
+    <div class="cards">
+        <div class="card">
+          <div class="label">Latest health index</div>
+          <div class="value">164.3</div>
+        </div>
+        
+        <div class="card">
+          <div class="label">Latest raw score</div>
+          <div class="value">69.8%</div>
+        </div>
+        
+        <div class="card">
+          <div class="label">Latest healthy share</div>
+          <div class="value">49.6%</div>
+        </div>
+        
+        <div class="card">
+          <div class="label">Considered spend</div>
+          <div class="value">37 075 Ft</div>
+        </div>
+        </div>
+
+    <div class="grid">
+      <div class="panel">
+        <h2>Healthiness index</h2>
+        <div class="chart-box"><canvas id="indexChart"></canvas></div>
+        <p>Spend-weighted category score normalized to the Jul-Sep 2022 baseline.</p>
+      </div>
+      <div class="panel">
+        <h2>Raw score and healthy share</h2>
+        <div class="chart-box"><canvas id="scoreChart"></canvas></div>
+        <p>Raw score is the spend-weighted average health score. Healthy share is spend on items scored at least 0.70.</p>
+      </div>
+    </div>
+
+    <div class="grid section">
+      <div class="panel">
+        <h2>Category weights</h2>
+        <table>
+          <thead><tr><th>Category</th><th>Score</th></tr></thead>
+          <tbody><tr><td>fruit</td><td>0.95</td></tr><tr><td>vegetables</td><td>1.00</td></tr><tr><td>plant_based_alternatives</td><td>0.82</td></tr><tr><td>dairy</td><td>0.58</td></tr><tr><td>beverages</td><td>0.52</td></tr><tr><td>pantry</td><td>0.45</td></tr><tr><td>bakery</td><td>0.38</td></tr><tr><td>meat</td><td>0.33</td></tr><tr><td>ready_meals</td><td>0.18</td></tr><tr><td>sweets_snacks</td><td>0.08</td></tr></tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <h2>Key product overrides</h2>
+        <table>
+          <thead><tr><th>Product group</th><th>Score</th></tr></thead>
+          <tbody><tr><td>banana_kg</td><td>1.00</td></tr><tr><td>banana_bunch</td><td>1.00</td></tr><tr><td>apple_kg</td><td>0.95</td></tr><tr><td>rolled_oats</td><td>0.90</td></tr><tr><td>bulgur</td><td>0.85</td></tr><tr><td>hummus</td><td>0.88</td></tr><tr><td>walnuts</td><td>0.86</td></tr><tr><td>cow_milk</td><td>0.58</td></tr><tr><td>oat_milk</td><td>0.82</td></tr><tr><td>greek_yogurt</td><td>0.68</td></tr><tr><td>sour_cream</td><td>0.42</td></tr><tr><td>gouda_cheese</td><td>0.42</td></tr><tr><td>trappista_cheese</td><td>0.42</td></tr><tr><td>wholemeal_toast_bread</td><td>0.68</td></tr><tr><td>fruit_muesli</td><td>0.52</td></tr><tr><td>instant_mix</td><td>0.25</td></tr><tr><td>mineral_water</td><td>1.00</td></tr><tr><td>szensavm_a_viz</td><td>0.95</td></tr><tr><td>almale</td><td>0.38</td></tr><tr><td>narancsle</td><td>0.32</td></tr><tr><td>lasagne_bolognese</td><td>0.25</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel section">
+      <h2>Latest month breakdown</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Spend</th>
+            <th>Share</th>
+            <th>Avg score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>pantry</td><td>15 237 Ft</td><td>+41.1%</td><td>+55.8%</td></tr><tr><td>vegetables</td><td>10 347 Ft</td><td>+27.9%</td><td>+100.0%</td></tr><tr><td>dairy</td><td>4 382 Ft</td><td>+11.8%</td><td>+47.9%</td></tr><tr><td>fruit</td><td>2 353 Ft</td><td>+6.3%</td><td>+99.0%</td></tr><tr><td>meat</td><td>1 713 Ft</td><td>+4.6%</td><td>+26.0%</td></tr><tr><td>plant_based_alternatives</td><td>1 696 Ft</td><td>+4.6%</td><td>+83.8%</td></tr><tr><td>bakery</td><td>923 Ft</td><td>+2.5%</td><td>+54.2%</td></tr><tr><td>beverages</td><td>424 Ft</td><td>+1.1%</td><td>+52.0%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel section">
+      <h2>Method</h2>
+      <div class="note">
+        Household items and fee rows are excluded. All other items are mapped to a category and optionally overridden by a product-group score.
+        Monthly values are weighted by line spend using quantity when available, then normalized to the average of Jul-Sep 2022.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const months = ["2021-08", "2021-09", "2021-10", "2021-11", "2021-12", "2022-01", "2022-02", "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12", "2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04"];
+    const indexValues = [106.6714818891087, 124.70888513220595, 97.5427752881853, 90.50521759017816, 105.93122639746475, 85.56452457456753, 113.48382235180212, 111.21912110147234, 93.3063292159895, 132.94853273762863, 128.81477827867974, 108.30201793937368, 92.5564963103717, 99.14148575025462, 94.32349147413056, 99.06202564448951, 99.60099336671556, 95.37285085630731, 116.41015544435965, 116.79559990918456, 117.53315277944476, 125.65406655402163, 122.79224277029024, 128.68750951764642, 116.34725994857038, 120.01775612324681, 118.93203491642406, 102.6509088653017, 121.49064143081223, 125.99204811222953, null, null, null, null, null, 122.19474453242753, 124.26206575822809, 141.36394813278213, 140.7974047937664, 136.0721288105107, 124.8672103934806, 143.94662195599807, null, 132.5964093827189, 135.50701536420252, 136.1203873256083, 135.46443100923727, 136.41111013921457, 150.42706198530993, 153.86015253134974, 144.87920395075986, 143.79474657871356, 155.34293918808032, 159.02083996629844, 158.7982790729924, 163.04263442686312, 164.25909110234983];
+    const indexTrend = [96.08, 97.09, 98.11, 99.12, 100.14, 101.15, 102.17, 103.18, 104.2, 105.21, 106.23, 107.25, 108.26, 109.28, 110.29, 111.31, 112.32, 113.34, 114.35, 115.37, 116.38, 117.4, 118.42, 119.43, 120.45, 121.46, 122.48, 123.49, 124.51, 125.52, null, null, null, null, null, 131.62, 132.63, 133.65, 134.66, 135.68, 136.69, 137.71, null, 139.74, 140.76, 141.77, 142.79, 143.8, 144.82, 145.83, 146.85, 147.86, 148.88, 149.89, 150.91, 151.92, 152.94];
+    const rawScores = [45.30967964174991, 52.971230302154126, 41.43217869860797, 38.44291222260159, 44.99524940617578, 36.34430804291778, 48.20328305391629, 47.24133065277326, 39.63270979697326, 56.471095371533366, 54.71524566422982, 46.00226462110392, 39.31421146792873, 42.11124547065842, 40.06475869367801, 42.077494069883286, 42.30642549934156, 40.510483610904906, 49.44626958228072, 49.60999061541549, 49.92327288803906, 53.37270468562919, 52.157119071408445, 54.66118710341581, 49.419554149864744, 50.978630698306674, 50.5174607661918, 43.60190477578963, 51.604252094512695, 53.516265418601286, null, null, null, null, null, 51.903326274452525, 52.7814397195717, 60.04561940414257, 59.804974981290584, 57.79787114033391, 53.03848039318603, 61.14263354022344, null, 56.321527782119695, 57.55783407738125, 57.81836938241638, 57.53974598629023, 57.94185653489395, 63.895259232354874, 65.35349558632144, 61.53875620275707, 61.07812309592884, 65.98332267040907, 67.5455443913789, 67.45100963290463, 69.25383807368272, 69.7705390821272];
+    const healthyShare = [18.01584567688598, 19.502674569900247, 10.60213661379087, 14.961925324737813, 13.509501187648457, 9.654036127823916, 19.881721154391677, 12.399981848478992, 21.48301027789512, 34.3567094108385, 30.858280260189346, 16.847215756850815, 11.907199707989843, 11.748466792749614, 10.897913765669085, 13.515515581294324, 14.279065942384966, 12.882969680103908, 10.220434541006915, 13.047829644318403, 14.644372324929064, 16.73034862578724, 21.187682449410445, 21.964305049414683, 22.432378197356908, 23.069449121354616, 19.658027736598257, 14.58556382032358, 20.598040448727094, 28.275335330642065, null, null, null, null, null, 18.834758133186693, 18.172726791384118, 33.45565977993707, 29.8738222085155, 26.496283253095033, 23.238798458405476, 33.12010653689045, null, 23.626616931982472, 25.271796803969554, 29.733242847694097, 22.936130005911405, 23.378908832441, 37.83264316886077, 38.45557825409349, 35.63893345904629, 32.830586363819506, 42.44242006776094, 40.39810828601214, 43.59143438592522, 47.36484083020263, 49.620951473459634];
+    const spend = [2903.0, 6917.0, 6178.0, 5611.604, 3368.0, 6817.128000000001, 9412.333999999999, 38828.702000000005, 4725.092, 3660.694, 7649.506, 17198.462, 23889.579999999998, 31644.776, 33817.39, 24774.386000000002, 29377.888, 22085.234, 34386.444, 28736.487999999994, 37868.622, 33015.63, 46707.46800000001, 38715.616, 33477.886, 31555.734000000004, 41358.208, 38685.49799999999, 39134.878, 29296.756, 0.0, 0.0, 0.0, 0.0, 0.0, 53671.39800000001, 68690.363, 21817.032000000003, 30583.511999999995, 23579.76, 55725.67800000001, 33634.92199999999, 0.0, 43503.376000000004, 14841.785999999998, 20894.66, 8718.742, 35183.524000000005, 41100.34799999999, 24196.37, 15663.196, 64877.43400000001, 35396.794, 65048.73400000001, 30048.049999999996, 58620.291999999994, 37075.46400000001];
+
+    new Chart(document.getElementById('indexChart'), {
+      type: 'line',
+      data: {
+        labels: months,
+        datasets: [{
+          label: 'Healthiness index',
+          data: indexValues,
+          borderColor: '#7dd3fc',
+          backgroundColor: 'rgba(125, 211, 252, .12)',
+          tension: .25,
+          borderWidth: 2,
+          pointRadius: 2,
+        },
+        {
+          label: 'Trendline',
+          data: indexTrend,
+          borderColor: '#fbbf24',
+          borderDash: [6, 6],
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0,
+          fill: false,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#ecf2ff' } } },
+        scales: {
+          x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,.08)' } },
+          y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,.08)' } }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('scoreChart'), {
+      type: 'line',
+      data: {
+        labels: months,
+        datasets: [
+          {
+            label: 'Raw score',
+            data: rawScores,
+            borderColor: '#fbbf24',
+            backgroundColor: 'rgba(251, 191, 36, .12)',
+            tension: .25,
+            borderWidth: 2,
+            pointRadius: 2,
+          },
+          {
+            label: 'Healthy share',
+            data: healthyShare,
+            borderColor: '#34d399',
+            backgroundColor: 'rgba(52, 211, 153, .12)',
+            tension: .25,
+            borderWidth: 2,
+            pointRadius: 2,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#ecf2ff' } } },
+        scales: {
+          x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,.08)' } },
+          y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,.08)' } }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

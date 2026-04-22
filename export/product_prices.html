@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lidl Plus Product Prices</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #131a2e;
+      --border: rgba(148,163,184,.18);
+      --text: #ecf2ff;
+      --muted: #94a3b8;
+      --accent: #7dd3fc;
+      --accent-2: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #08101e 0%, #0d1426 100%);
+      color: var(--text);
+    }
+    .wrap { max-width: 1400px; margin: 0 auto; padding: 28px; }
+    h1 { margin: 0 0 8px; font-size: 30px; }
+    .sub { color: var(--muted); margin-bottom: 22px; }
+    .cards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .card, .panel {
+      background: rgba(19,26,46,.92);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 12px 28px rgba(0,0,0,.18);
+    }
+    .card { padding: 18px; }
+    .label { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+    .value { font-size: 27px; font-weight: 700; margin-top: 8px; }
+    .grid { display: grid; grid-template-columns: 2fr 2fr; gap: 16px; margin-top: 16px; }
+    .panel { padding: 18px; }
+    .panel h2 { margin: 0 0 10px; font-size: 18px; }
+    .panel p { margin: 8px 0 0; color: var(--muted); }
+    .chart-box { height: 370px; }
+    .section { margin-top: 18px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+    th { color: var(--muted); font-weight: 600; }
+    .note { color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .small { font-size: 12px; color: var(--muted); }
+    @media (max-width: 1200px) {
+      .cards, .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Lidl Plus Product Prices</h1>
+    <div class="sub">Banana kg price and cow-vs-oat milk comparison · Aug 2021 – Apr 2026</div>
+    <div class="cards">
+        <div class="card">
+          <div class="label">Banana latest</div>
+          <div class="value">605 Ft / kg</div>
+        </div>
+        
+        <div class="card">
+          <div class="label">Banana change</div>
+          <div class="value">156 Ft (+34.7%)</div>
+        </div>
+        
+        <div class="card">
+          <div class="label">Cow milk latest net</div>
+          <div class="value">351 Ft / l</div>
+        </div>
+        
+        <div class="card">
+          <div class="label">Oat milk latest net</div>
+          <div class="value">314 Ft / l</div>
+        </div>
+        
+        <div class="card">
+          <div class="label">Oat premium</div>
+          <div class="value">-37 Ft (-10.6%)</div>
+        </div>
+        </div>
+
+    <div class="grid">
+      <div class="panel">
+        <h2>Banana price per kg</h2>
+        <div class="chart-box"><canvas id="bananaChart"></canvas></div>
+        <p>Gross unit price across the banana_kg group.</p>
+      </div>
+      <div class="panel">
+        <h2>Cow milk vs oat milk</h2>
+        <div class="chart-box"><canvas id="milkChart"></canvas></div>
+        <p>Net unit price after VAT adjustment: cow milk uses 5% VAT (A), oat milk 27% VAT (C).</p>
+      </div>
+    </div>
+
+    <div class="grid section">
+      <div class="panel">
+        <h2>Selected product groups</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Group</th>
+              <th>Category</th>
+              <th>Raw articles</th>
+              <th>Usage</th>
+              <th>VAT types</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>banana_kg</td><td>fruit</td><td>BANÁN KG, BANDÁZSOLT BANÁN KG, BANÁN BIO KG, BANÁN, BANDÁZSOLT KG</td><td>180 · 2021-11–2026-04</td><td>C</td><td>—</td></tr><tr><td>cow_milk</td><td>dairy</td><td>TEJ 2,8%, TARTÓS TEJ 2,8%, UHT TEJ 2,8%, UHT TEJ 1,5%, DUNATEJ UHT TEJ2,8, PILOS XXL TEJ 2,8%, UHT TEJ EDGE 2,8%</td><td>127 · 2022-03–2025-08</td><td>A</td><td>A=5%</td></tr><tr><td>oat_milk</td><td>plant_based_alternatives</td><td>VEMONDO BIO ZABITA, BIO ZABITAL</td><td>20 · 2025-08–2026-04</td><td>C</td><td>C=27%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <h2>Category overview</h2>
+        <table>
+          <thead>
+            <tr><th>Category</th><th>Items</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>pantry</td><td>283</td></tr><tr><td>dairy</td><td>107</td></tr><tr><td>fruit</td><td>80</td></tr><tr><td>bakery</td><td>59</td></tr><tr><td>vegetables</td><td>52</td></tr><tr><td>sweets_snacks</td><td>36</td></tr><tr><td>meat</td><td>33</td></tr><tr><td>beverages</td><td>28</td></tr><tr><td>household</td><td>28</td></tr><tr><td>plant_based_alternatives</td><td>6</td></tr><tr><td>fees</td><td>2</td></tr><tr><td>ready_meals</td><td>2</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel section">
+      <h2>Method</h2>
+      <div class="note">
+        Banana uses the grouped kg variants only. Cow milk and oat milk use VAT-aware net prices so the comparison is meaningful across different VAT rates.
+        `E` tax items are excluded because they are deposit-return fees, not products.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const bananaMonths = ["2021-11", "2022-01", "2022-02", "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12", "2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04"];
+    const bananaValues = [449.0, 499.0, 431.5, 524.0, 549.0, 569.0, 513.0, 469.57, 559.0, 603.29, 670.43, 681.5, 642.33, 699.0, 613.5, 699.0, 682.33, 699.0, 660.67, 632.6, 639.5, 611.4, 565.5, 623.0, 499.0, 685.0, 632.33, 624.0, 699.0, 649.0, 599.0, 529.67, 636.5, 799.0, 694.0, 699.0, 599.0, 646.5, 699.0, 699.0, 699.0, 605.0, 599.0, 659.0, 699.0, 679.0, 605.0];
+    const bananaTrend = [552.46, 555.47, 558.48, 561.49, 564.5, 567.51, 570.52, 573.53, 576.54, 579.55, 582.57, 585.58, 588.59, 591.6, 594.61, 597.62, 600.63, 603.64, 606.65, 609.66, 612.67, 615.68, 618.69, 621.7, 624.72, 627.73, 630.74, 633.75, 636.76, 639.77, 642.78, 645.79, 648.8, 651.81, 654.82, 657.83, 660.84, 663.85, 666.87, 669.88, 672.89, 675.9, 678.91, 681.92, 684.93, 687.94, 690.95];
+    const bananaCounts = [1, 2, 6, 2, 1, 4, 7, 7, 5, 7, 7, 4, 3, 3, 4, 5, 6, 3, 6, 5, 4, 5, 4, 3, 5, 5, 3, 2, 3, 4, 2, 6, 4, 3, 2, 2, 1, 4, 4, 1, 2, 5, 3, 5, 2, 5, 3];
+    const milkMonths = ["2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12", "2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04"];
+    const cowValues = [218.1, null, null, null, 292.38, 305.71, 328.3, 291.56, 280.0, 418.1, 418.1, 418.1, 410.1, 395.24, 390.0, 199.05, 229.21, 200.95, 221.27, 259.05, 295.24, 313.33, 300.0, null, null, null, null, null, 270.79, 278.1, 360.95, 360.95, 360.95, 389.52, 399.05, null, 365.71, null, null, null, 375.56, 351.43, null, null, null, null, null, null, null, null];
+    const cowCounts = [1, 0, 0, 0, 2, 5, 7, 7, 6, 4, 3, 5, 5, 6, 4, 6, 6, 5, 6, 10, 6, 5, 4, 0, 0, 0, 0, 0, 3, 2, 1, 4, 2, 4, 2, 0, 2, 0, 0, 0, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0];
+    const oatValues = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 314.17, 314.17, null, 314.17, 314.17, 302.36, 314.17, 314.17, 314.17];
+    const oatCounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 5, 2, 4, 2, 2, 3];
+
+    new Chart(document.getElementById('bananaChart'), {
+      type: 'line',
+      data: {
+        labels: bananaMonths,
+        datasets: [{
+          label: 'Banana gross Ft/kg',
+          data: bananaValues,
+          borderColor: '#7dd3fc',
+          backgroundColor: 'rgba(125, 211, 252, .12)',
+          tension: .25,
+          borderWidth: 2,
+          pointRadius: 2,
+        },
+        {
+          label: 'Trendline',
+          data: bananaTrend,
+          borderColor: '#fbbf24',
+          borderDash: [6, 6],
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0,
+          fill: false,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: '#ecf2ff' } },
+          tooltip: {
+            callbacks: {
+              afterLabel: (ctx) => 'Entries: ' + bananaCounts[ctx.dataIndex]
+            }
+          }
+        },
+        scales: {
+          x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,.08)' } },
+          y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,.08)' } }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('milkChart'), {
+      type: 'line',
+      data: {
+        labels: milkMonths,
+        datasets: [
+          {
+            label: 'Cow milk net Ft/l',
+            data: cowValues,
+            borderColor: '#fbbf24',
+            backgroundColor: 'rgba(251, 191, 36, .12)',
+            tension: .25,
+            borderWidth: 2,
+            pointRadius: 2,
+          },
+          {
+            label: 'Oat milk net Ft/l',
+            data: oatValues,
+            borderColor: '#34d399',
+            backgroundColor: 'rgba(52, 211, 153, .12)',
+            tension: .25,
+            borderWidth: 2,
+            pointRadius: 2,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: '#ecf2ff' } },
+          tooltip: {
+            callbacks: {
+              afterLabel: (ctx) => {
+                if (ctx.dataset.label === 'Cow milk net Ft/l') return 'Entries: ' + cowCounts[ctx.dataIndex];
+                if (ctx.dataset.label === 'Oat milk net Ft/l') return 'Entries: ' + oatCounts[ctx.dataIndex];
+                return '';
+              }
+            }
+          }
+        },
+        scales: {
+          x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,.08)' } },
+          y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,.08)' } }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

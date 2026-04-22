@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lidl Plus Analytics</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #131a2e;
+      --panel-soft: #18213a;
+      --text: #ecf2ff;
+      --muted: #94a3b8;
+      --accent: #7dd3fc;
+      --accent-2: #fbbf24;
+      --border: rgba(148,163,184,.18);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #08101e 0%, #0d1426 100%);
+      color: var(--text);
+    }
+    .wrap { max-width: 1400px; margin: 0 auto; padding: 28px; }
+    h1 { margin: 0 0 8px; font-size: 30px; }
+    .sub { color: var(--muted); margin-bottom: 22px; }
+    .cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .card, .panel {
+      background: rgba(19,26,46,.92);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 12px 28px rgba(0,0,0,.18);
+    }
+    .card { padding: 18px; }
+    .label { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+    .value { font-size: 28px; font-weight: 700; margin-top: 8px; }
+    .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-top: 16px; }
+    .panel { padding: 18px; }
+    .panel h2 { margin: 0 0 10px; font-size: 18px; }
+    .panel p { margin: 8px 0 0; color: var(--muted); }
+    .chart-box { height: 360px; }
+    .chart-box.sm { height: 300px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      white-space: nowrap;
+    }
+    th { color: var(--muted); font-weight: 600; }
+    .section { margin-top: 18px; }
+    .two-col { display: grid; grid-template-columns: 1.3fr .7fr; gap: 16px; }
+    .note { color: var(--muted); font-size: 13px; line-height: 1.5; }
+    @media (max-width: 1100px) {
+      .cards, .grid, .two-col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Lidl Plus Analytics</h1>
+    <div class="sub">Aug 2021 – Apr 2026 · basket inflation focused on the weekly-shopping era from Jul 2022</div>
+    <div class="cards">
+        <div class="card">
+          <div class="label">Total receipts</div>
+          <div class="value">416</div>
+        </div>
+        
+        <div class="card">
+          <div class="label">Total spend</div>
+          <div class="value">1 574 729 Ft</div>
+        </div>
+        
+        <div class="card">
+          <div class="label">Average basket</div>
+          <div class="value">3 785 Ft</div>
+        </div>
+        
+        <div class="card">
+          <div class="label">Latest basket index</div>
+          <div class="value">154.0</div>
+        </div>
+        </div>
+
+    <div class="grid">
+      <div class="panel">
+        <h2>Staple basket inflation</h2>
+        <div class="chart-box"><canvas id="basketChart"></canvas></div>
+        <p>Basket index uses automatically selected recurring items, normalized to 100 on the Jul-Aug 2022 2-month baseline.</p>
+      </div>
+      <div class="panel">
+        <h2>Method</h2>
+        <div class="note">
+          The basket uses the most frequent items from the weekly-shopping era that began after you moved out in Jul 2022.
+          It currently requires at least 20 purchases and 8 distinct months of coverage since Jul 2022.
+          Each point is a 2-month rolling average ending in that month, and the basket line is shown only when at least four selected staples are available.
+        </div>
+        <div class="section">
+          <div class="label">Selected basket items</div>
+          <div class="note">BANÁN KG, TEJBERIZS MEGGY(3), TELJESKIŐRL.TOAST, TEJBERIZS FAHÉJ(3), TEJ 2,8%, ALMÁS HÁROMSZÖG, INSTANT TÉ.TYÚ(20), INSTANT TÉ.MAR(12), TEJBERIZS CSOKI(3)</div>
+        </div>
+        <div class="section">
+          <div class="label">Latest 2-mo basket price</div>
+            <div class="value">369 Ft</div>
+        </div>
+        <div class="section">
+          <div class="label">Inflation since baseline</div>
+            <div class="value">+54.0%</div>
+        </div>
+        <div class="section">
+          <div class="label">Latest 2-mo window</div>
+            <div class="value">2026-03–2026-04</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid section">
+      <div class="panel">
+        <h2>Monthly spend and receipt count</h2>
+        <div class="chart-box"><canvas id="spendChart"></canvas></div>
+      </div>
+      <div class="panel">
+        <h2>Top stores by spend</h2>
+        <div class="chart-box sm"><canvas id="storeChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="panel section">
+      <h2>Basket item price change</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Jul-Aug 2022 avg</th>
+            <th>Latest 2-mo avg</th>
+            <th>Delta</th>
+            <th>Delta %</th>
+            <th>Latest window</th>
+            <th>Months covered</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>BANÁN KG</td><td>514 Ft</td><td>642 Ft</td><td>128 Ft</td><td>+24.8%</td><td>2026-03–2026-04</td><td>40</td></tr><tr><td>TEJBERIZS MEGGY(3)</td><td>199 Ft</td><td>269 Ft</td><td>70 Ft</td><td>+35.2%</td><td>2025-09–2025-10</td><td>28</td></tr><tr><td>TELJESKIŐRL.TOAST</td><td>324 Ft</td><td>399 Ft</td><td>75 Ft</td><td>+23.1%</td><td>2024-12–2025-01</td><td>24</td></tr><tr><td>TEJBERIZS FAHÉJ(3)</td><td>199 Ft</td><td>269 Ft</td><td>70 Ft</td><td>+35.2%</td><td>2025-11–2025-12</td><td>28</td></tr><tr><td>TEJ 2,8%</td><td>314 Ft</td><td>315 Ft</td><td>1 Ft</td><td>+0.3%</td><td>2024-08–2024-09</td><td>19</td></tr><tr><td>ALMÁS HÁROMSZÖG</td><td>114 Ft</td><td>239 Ft</td><td>125 Ft</td><td>+109.6%</td><td>2025-10–2025-11</td><td>20</td></tr><tr><td>INSTANT TÉ.TYÚ(20)</td><td>189 Ft</td><td>249 Ft</td><td>60 Ft</td><td>+31.7%</td><td>2025-05–2025-06</td><td>16</td></tr><tr><td>INSTANT TÉ.MAR(12)</td><td>189 Ft</td><td>249 Ft</td><td>60 Ft</td><td>+31.7%</td><td>2025-05–2025-06</td><td>15</td></tr><tr><td>TEJBERIZS CSOKI(3)</td><td>199 Ft</td><td>249 Ft</td><td>50 Ft</td><td>+25.1%</td><td>2025-07–2025-08</td><td>19</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const basketMonths = ["2022-08", "2022-09", "2022-10", "2022-11", "2022-12", "2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04"];
+    const basketPoints = [{"ym": "2022-08", "window": "2022-07–2022-08", "index": 100.0, "avg_price": 249.03, "coverage": 9}, {"ym": "2022-09", "window": "2022-08–2022-09", "index": 109.8, "avg_price": 270.83, "coverage": 9}, {"ym": "2022-10", "window": "2022-09–2022-10", "index": 120.84, "avg_price": 295.11, "coverage": 9}, {"ym": "2022-11", "window": "2022-10–2022-11", "index": 129.26, "avg_price": 315.07, "coverage": 9}, {"ym": "2022-12", "window": "2022-11–2022-12", "index": 133.04, "avg_price": 322.52, "coverage": 9}, {"ym": "2023-01", "window": "2022-12–2023-01", "index": 139.18, "avg_price": 342.8, "coverage": 8}, {"ym": "2023-02", "window": "2023-01–2023-02", "index": 136.86, "avg_price": 351.46, "coverage": 7}, {"ym": "2023-03", "window": "2023-02–2023-03", "index": 136.05, "avg_price": 350.15, "coverage": 7}, {"ym": "2023-04", "window": "2023-03–2023-04", "index": 138.34, "avg_price": 355.5, "coverage": 7}, {"ym": "2023-05", "window": "2023-04–2023-05", "index": 137.98, "avg_price": 354.38, "coverage": 7}, {"ym": "2023-06", "window": "2023-05–2023-06", "index": 133.37, "avg_price": 344.26, "coverage": 7}, {"ym": "2023-07", "window": "2023-06–2023-07", "index": 130.26, "avg_price": 335.57, "coverage": 7}, {"ym": "2023-08", "window": "2023-07–2023-08", "index": 122.71, "avg_price": 300.52, "coverage": 9}, {"ym": "2023-09", "window": "2023-08–2023-09", "index": 119.62, "avg_price": 290.86, "coverage": 9}, {"ym": "2023-10", "window": "2023-09–2023-10", "index": 116.7, "avg_price": 288.04, "coverage": 9}, {"ym": "2023-11", "window": "2023-10–2023-11", "index": 115.15, "avg_price": 289.31, "coverage": 9}, {"ym": "2023-12", "window": "2023-11–2023-12", "index": 116.19, "avg_price": 308.44, "coverage": 8}, {"ym": "2024-01", "window": "2023-12–2024-01", "index": 108.1, "avg_price": 270.31, "coverage": 9}, {"ym": "2024-02", "window": "2024-01–2024-02", "index": 108.32, "avg_price": 276.63, "coverage": 9}, {"ym": "2024-03", "window": "2024-02–2024-03", "index": null, "avg_price": null, "coverage": 0}, {"ym": "2024-04", "window": "2024-03–2024-04", "index": null, "avg_price": null, "coverage": 0}, {"ym": "2024-05", "window": "2024-04–2024-05", "index": null, "avg_price": null, "coverage": 0}, {"ym": "2024-06", "window": "2024-05–2024-06", "index": null, "avg_price": null, "coverage": 0}, {"ym": "2024-07", "window": "2024-06–2024-07", "index": 113.81, "avg_price": 317.48, "coverage": 7}, {"ym": "2024-08", "window": "2024-07–2024-08", "index": 116.03, "avg_price": 313.08, "coverage": 8}, {"ym": "2024-09", "window": "2024-08–2024-09", "index": 119.25, "avg_price": 335.57, "coverage": 7}, {"ym": "2024-10", "window": "2024-09–2024-10", "index": 121.6, "avg_price": 334.83, "coverage": 6}, {"ym": "2024-11", "window": "2024-10–2024-11", "index": 117.12, "avg_price": 306.86, "coverage": 7}, {"ym": "2024-12", "window": "2024-11–2024-12", "index": 125.83, "avg_price": 289.04, "coverage": 8}, {"ym": "2025-01", "window": "2024-12–2025-01", "index": 135.04, "avg_price": 325.51, "coverage": 6}, {"ym": "2025-02", "window": "2025-01–2025-02", "index": null, "avg_price": null, "coverage": 3}, {"ym": "2025-03", "window": "2025-02–2025-03", "index": null, "avg_price": null, "coverage": 3}, {"ym": "2025-04", "window": "2025-03–2025-04", "index": null, "avg_price": null, "coverage": 3}, {"ym": "2025-05", "window": "2025-04–2025-05", "index": 129.83, "avg_price": 338.5, "coverage": 5}, {"ym": "2025-06", "window": "2025-05–2025-06", "index": 127.99, "avg_price": 329.0, "coverage": 5}, {"ym": "2025-07", "window": "2025-06–2025-07", "index": 145.25, "avg_price": 339.94, "coverage": 4}, {"ym": "2025-08", "window": "2025-07–2025-08", "index": 147.68, "avg_price": 352.44, "coverage": 4}, {"ym": "2025-09", "window": "2025-08–2025-09", "index": null, "avg_price": null, "coverage": 3}, {"ym": "2025-10", "window": "2025-09–2025-10", "index": 153.98, "avg_price": 369.0, "coverage": 4}, {"ym": "2025-11", "window": "2025-10–2025-11", "index": null, "avg_price": null, "coverage": 3}, {"ym": "2025-12", "window": "2025-11–2025-12", "index": null, "avg_price": null, "coverage": 2}, {"ym": "2026-01", "window": "2025-12–2026-01", "index": null, "avg_price": null, "coverage": 1}, {"ym": "2026-02", "window": "2026-01–2026-02", "index": null, "avg_price": null, "coverage": 1}, {"ym": "2026-03", "window": "2026-02–2026-03", "index": null, "avg_price": null, "coverage": 1}, {"ym": "2026-04", "window": "2026-03–2026-04", "index": null, "avg_price": null, "coverage": 1}];
+    const monthlyMonths = ["2021-08", "2021-09", "2021-10", "2021-11", "2021-12", "2022-01", "2022-02", "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12", "2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04"];
+    const monthlySpend = [3253.0, 7810.0, 5855.0, 5864.0, 3238.0, 6697.0, 9273.0, 49588.0, 4725.0, 3778.0, 7530.0, 20401.0, 29761.0, 34986.0, 35472.0, 27994.0, 30643.0, 23410.0, 42084.0, 31306.0, 41984.0, 31772.0, 46005.0, 39381.0, 34223.0, 32926.0, 44060.0, 40770.0, 37792.0, 30498.0, 59856.0, 72767.0, 23799.0, 32252.0, 25694.0, 59188.0, 34720.0, 43385.0, 15192.0, 20894.0, 8644.0, 38842.0, 42639.0, 24985.0, 15819.0, 64808.0, 35464.0, 66287.0, 30239.0, 58371.0, 37805.0];
+    const monthlyReceipts = [7, 23, 14, 13, 6, 16, 17, 15, 9, 7, 12, 16, 10, 10, 9, 11, 8, 8, 9, 10, 9, 7, 12, 8, 9, 10, 10, 11, 7, 6, 6, 3, 5, 4, 3, 8, 6, 6, 3, 3, 1, 4, 4, 3, 5, 6, 4, 6, 7, 6, 4];
+    const storeLabels = ["Budapest, Leonardo da Vinci utca (Budapest)", "Budapest, Üllői út 112. (Budapest)", "Balassagyarmat, Kóvári út (Balassagyarmat)", "Budapest, Váci út (Budapest)", "Budapest, Hungária körút (Budapest)", "Budapest, Ferenciek tere (Budapest)", "Budapest, Teleki tér (Budapest)", "Budapest, Bajcsy-Zsilinszky út (Budapest)", "Vác, Bolgár utca (Vác)", "Vác, Naszály utca (Vác)"];
+    const storeSpend = [611815.0, 504979.0, 102325.0, 91552.0, 64836.0, 39939.0, 35302.0, 29859.0, 18513.0, 13088.0];
+    const basketIndexData = [100.0, 109.8, 120.84, 129.26, 133.04, 139.18, 136.86, 136.05, 138.34, 137.98, 133.37, 130.26, 122.71, 119.62, 116.7, 115.15, 116.19, 108.1, 108.32, null, null, null, null, 113.81, 116.03, 119.25, 121.6, 117.12, 125.83, 135.04, null, null, null, 129.83, 127.99, 145.25, 147.68, null, 153.98, null, null, null, null, null, null];
+    const basketCoverage = [9, 9, 9, 9, 9, 8, 7, 7, 7, 7, 7, 7, 9, 9, 9, 9, 8, 9, 9, 0, 0, 0, 0, 7, 8, 7, 6, 7, 8, 6, 3, 3, 3, 5, 5, 4, 4, 3, 4, 3, 2, 1, 1, 1, 1];
+    const basketItemsSelected = ["BANÁN KG", "TEJBERIZS MEGGY(3)", "TELJESKIŐRL.TOAST", "TEJBERIZS FAHÉJ(3)", "TEJ 2,8%", "ALMÁS HÁROMSZÖG", "INSTANT TÉ.TYÚ(20)", "INSTANT TÉ.MAR(12)", "TEJBERIZS CSOKI(3)"];
+
+    new Chart(document.getElementById('basketChart'), {
+      type: 'line',
+      data: {
+        labels: basketMonths,
+        datasets: [
+          {
+            label: 'Basket index',
+            data: basketIndexData,
+            borderColor: '#7dd3fc',
+            backgroundColor: 'rgba(125, 211, 252, .12)',
+            tension: .25,
+            borderWidth: 2,
+            pointRadius: 3,
+          },
+          {
+            label: 'Coverage',
+            data: basketCoverage,
+            type: 'bar',
+            yAxisID: 'y1',
+            backgroundColor: 'rgba(251, 191, 36, .25)',
+            borderColor: '#fbbf24',
+            borderWidth: 1,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: '#ecf2ff' } },
+          tooltip: {
+            callbacks: {
+              afterLabel: (ctx) => {
+                if (ctx.dataset.label === 'Basket index') {
+                  const p = basketPoints[ctx.dataIndex];
+                  return 'Window: ' + p.window + '\nCoverage: ' + p.coverage + '/' + basketItemsSelected.length;
+                }
+                return '';
+              }
+            }
+          }
+        },
+        scales: {
+          x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,.08)' } },
+          y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,.08)' } },
+          y1: {
+            position: 'right',
+            ticks: { color: '#94a3b8' },
+            grid: { drawOnChartArea: false },
+            suggestedMax: 8
+          }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('spendChart'), {
+      type: 'line',
+      data: {
+        labels: monthlyMonths,
+        datasets: [
+          {
+            label: 'Spend',
+            data: monthlySpend,
+            borderColor: '#7dd3fc',
+            backgroundColor: 'rgba(125, 211, 252, .12)',
+            tension: .25,
+            yAxisID: 'y',
+          },
+          {
+            label: 'Receipts',
+            data: monthlyReceipts,
+            borderColor: '#fbbf24',
+            backgroundColor: 'rgba(251, 191, 36, .15)',
+            tension: .25,
+            yAxisID: 'y1',
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#ecf2ff' } } },
+        scales: {
+          x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,.08)' } },
+          y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,.08)' } },
+          y1: {
+            position: 'right',
+            ticks: { color: '#94a3b8' },
+            grid: { drawOnChartArea: false }
+          }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('storeChart'), {
+      type: 'bar',
+      data: {
+        labels: storeLabels,
+        datasets: [{
+          label: 'Spend',
+          data: storeSpend,
+          backgroundColor: 'rgba(125, 211, 252, .65)',
+          borderColor: '#7dd3fc',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y',
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,.08)' } },
+          y: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
